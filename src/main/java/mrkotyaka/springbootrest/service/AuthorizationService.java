@@ -18,20 +18,14 @@ public class AuthorizationService {
 
     public List<Authorities> getAuthorities(String user, String password) {
 
-        System.out.println("AuthorizationService -> getAuthorities: " +user + " | " + password);
-
         if (isEmpty(user) || isEmpty(password)) {
             throw new InvalidCredentials("User name or password is empty");
         }
-
-        System.out.println("AuthorizationService -> getAuthorities -> Not empty creds: " +user + " | " + password);
 
         List<Authorities> userAuthorities = userRepository.getUserAuthorities(user, password);
         if (isEmpty(userAuthorities)) {
             throw new UnauthorizedUser("Unknown user " + user);
         }
-
-        System.out.println("AuthorizationService -> getAuthorities -> Not empty authorities: " +userAuthorities);
 
         return userAuthorities;
     }
