@@ -1,0 +1,7 @@
+version: '3'
+
+services:
+  restapp:
+    image: 'restapp:1.0'
+    ports:
+      - '8080'
