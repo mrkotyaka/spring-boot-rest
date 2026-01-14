@@ -1,28 +1,28 @@
-# Задача «Сервис авторизации»
+# Task: Authorization Service
 
-## Описание
+## Description
 
-Сегодня вы реализуете сервис авторизации пользователей по логину и паролю. Ключевое в этом задании то, как ваше приложение будет реагировать на ошибки, которые ваш сервис будет выбрасывать в разных случаях.
+Today, you will implement a user authorization service based on login and password. The key to this task is how your application will respond to errors that your service will throw in different cases.
 
-Для работы нужно подготовить несколько классов.
+To get started, you need to prepare several classes.
 
-**Шаг 0**. Создайте Spring Boot приложение и все классы контроллеры, сервисы и репозитории сделать бинами в вашем application context.
+**Step 0**. Create a Spring Boot application and make all controller, service, and repository classes binaries in your application context.
 
-**Шаг 1**. Запрос на разрешения будет приходить на контроллер:
+**Step 1**. The authorization request will be sent to the controller:
 
 ```java
 @RestController
 public class AuthorizationController {
     AuthorizationService service;
     
-    @GetMapping("/authorize")
-    public List<Authorities> getAuthorities(@RequestParam("user") String user, @RequestParam("password") String password) {
+    @GetMapping(“/authorize”)
+    public List<Authorities> getAuthorities(@RequestParam(“user”) String user, @RequestParam(“password”) String password) {
         return service.getAuthorities(user, password);
     }
 }
-``` 
+```
 
-**Шаг 2.** Класс-сервис, который будет обрабатывать введённые логин и пароль, выглядит так:
+**Step 2.** The class service that will process the entered login and password looks like this:
 
 ```java
 public class AuthorizationService {
@@ -30,11 +30,11 @@ public class AuthorizationService {
 
     List<Authorities> getAuthorities(String user, String password) {
         if (isEmpty(user) || isEmpty(password)) {
-            throw new InvalidCredentials("User name or password is empty");
+            throw new InvalidCredentials(“User name or password is empty”);
         }
         List<Authorities> userAuthorities = userRepository.getUserAuthorities(user, password);
         if (isEmpty(userAuthorities)) {
-            throw new UnauthorizedUser("Unknown user " + user);
+            throw new UnauthorizedUser(“Unknown user ” + user);
         }
         return userAuthorities;
     }
@@ -48,7 +48,7 @@ public class AuthorizationService {
     }
 }
 ``` 
-Он принимает в себя логин и пароль и возвращает разрешения для этого пользователя, если такой пользователь найден и данные валидны. Если присланные данные неверны, тогда выкидывается InvalidCredentials:
+It accepts the login and password and returns permissions for that user if such a user is found and the data is valid. If the data sent is incorrect, then InvalidCredentials is thrown:
 
 ```java
 public class InvalidCredentials extends RuntimeException {
@@ -58,7 +58,7 @@ public class InvalidCredentials extends RuntimeException {
 }
 ``` 
 
-Если ваш репозиторий не вернул никаких разрешений, либо вернул пустую коллекцию, тогда выкидывается ошибка UnauthorizedUser:
+If your repository did not return any permissions or returned an empty collection, then an UnauthorizedUser error is thrown:
 
 ```java
 public class UnauthorizedUser extends RuntimeException {
@@ -68,7 +68,7 @@ public class UnauthorizedUser extends RuntimeException {
 }
 ``` 
 
-Enum с разрешениями выглядит так:
+The enum with permissions looks like this:
 
 ```java
 public enum Authorities {
@@ -76,7 +76,7 @@ public enum Authorities {
 }
 ``` 
 
-**Шаг 3.** Код-метод getUserAuthorities класс UserRepository, который возвращает либо разрешения, либо пустой массив, надо реализовать вам.
+**Step 3.** You need to implement the getUserAuthorities method in the UserRepository class, which returns either permissions or an empty array.
 
 ```java
 public class UserRepository {
@@ -86,14 +86,14 @@ public class UserRepository {
 }
 ``` 
 
-Для проверки работоспособности можно сделать запрос из браузера, заполнив `<ИМЯ_ЮЗЕРА>` и `<ПАРОЛЬ_ЮЗЕРА>` своими тестовыми данными:
+To check if it works, you can make a request from your browser by filling in `<USERNAME>` and `<USERPASSWORD>` with your test data:
 
-localhost:8080/authorize?user=<ИМЯ_ЮЗЕРА>&password=<ПАРОЛЬ_ЮЗЕРА>
+localhost:8080/authorize?user=<USERNAME>&password=<USERPASSWORD>
 
-**Шаг 4.** Теперь, когда весь код у вас готов, вам нужно написать обработчики ошибок, которые выкидывает сервис `AuthorizationService`.
+**Step 4.** Now that you have all the code ready, you need to write error handlers for errors thrown by the `AuthorizationService` service.
 
-Требования к обработчикам ошибок:
+Requirements for error handlers:
 
-* на `InvalidCredentials` он должен отсылать обратно клиенту HTTP-статус с кодом 400 и телом в виде сообщения из exception;
-* на `UnauthorizedUser` он должен отсылать обратно клиенту HTTP-статус с кодом 401 и телом в виде сообщения из exception и писать в консоль сообщение из exception.
+* For `InvalidCredentials`, it must send back an HTTP status with code 400 and a body in the form of a message from the exception to the client.
+* For `UnauthorizedUser`, it must send back an HTTP status with code 401 and a body in the form of a message from the exception to the client and write a message from the exception to the console.
  
